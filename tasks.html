@@ -18,7 +18,7 @@
         <div id="summary">
             <button></button>>
         </div>
-        <div id = "location"></div>
+        <div ><input type = 'text' id = 'location'></input></div>
         <div id = "type"></div>
         <div id = "task"></div>
         <div id = "description"></div>
@@ -52,25 +52,25 @@
                 xhr.open('GET', 'http://localhost:3333/alltasks', true) ;
                 xhr.onload = function(){
                     var createdTasks = JSON.parse(this.response);
-                    console.log(createdTasks);
+                    
                     var createdTasksDivs;
                     
                     var createdTasksBlock = document.getElementById('created_tasks');
-                    console.log(createdTasksBlock);
+                    
                     createdTasksDivs = new Array;
                     
                     for (i in createdTasks){
-                        console.log(createdTasks[i]);
+                       
                         createdTasksDivs[i] = document.createElement('div'); 
                         let taskDate = parseDate(createdTasks[i].id);   
-                        console.log(createdTasks[i].description);
+                        
                         let text = `<div id=${createdTasks[i].id}><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
                        
                        createdTasksDivs[i].innerHTML = text;
-                        console.log(createdTasksDivs[i]);
+                        
                         createdTasksBlock.append(createdTasksDivs[i]);                      
                     }                    
-                    console.log(createdTasksDivs);
+                    
                 }
                 xhr.send();
             }
@@ -90,13 +90,47 @@
 
 
             function createTask() {
-               let newTaskButton =  document.getElementById('new_task');
+                var taskType;
+                var taskSubtype;
+                var taskDescription;
+                let newTaskButton =  document.getElementById('new_task');
 
-               newTaskButton.addEventListener('click', showNewTaskOptions, true)
+               newTaskButton.addEventListener('click', showNewTaskOptions, true);
 
                function showNewTaskOptions(action) {
 
-                let taskOptions = document.getElementById('task_parameters');
+                    let taskOptions = document.getElementById('type');
+                    var taskTypeDivs = new Array;
+
+                    for (let i in taskTypes) {
+                        taskTypeDivs[i] = document.createElement('div');
+                        taskTypeDivs[i].innerHTML = taskTypes[i].type;
+                        taskTypeDivs[i].addEventListener('click', selectType, true);
+                        taskOptions.append(taskTypeDivs[i]);    
+                    }
+
+                    
+
+                    function selectType(e) {
+                        e.preventDefault();
+                        taskType = e.currentTarget.innerText;
+                        showSubtypes(taskType);
+                    } 
+                    
+                    function showSubtypes(selectedType){
+                        var subTypesDiv = document.getElementById('task');
+                        var selectedSubtypes = taskTypes.find(task => task.type === selectedType);
+                        var subTypesDivs = new Array;
+                        console.log(selectedSubtypes);
+
+                        for (let i in selectedSubtypes.tasks) {
+                            subTypesDivs[i] = document.createElement('div');
+                            subTypesDivs[i].innerHTML =  selectedSubtypes.tasks[i];
+                            subTypesDiv.append(subTypesDivs[i]); 
+                        }
+
+                    }
+                
 
                 }
 
@@ -106,6 +140,7 @@
 
             
             getTasks();
+            createTask();
             
             
               </script>
