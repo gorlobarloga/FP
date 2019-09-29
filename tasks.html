@@ -4,11 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Tasks</title> 
-  <script src="tasks.js"></script>
+
+ 
+  
 </head>
 <body>
+    
     <div id="tasks">
-        <div id="new_task"></div> 
+        <div id="new_task">+ NEW TASK</div> 
         <div id="created_tasks">
     </div>
     <div id="task_parameters">
@@ -21,5 +24,92 @@
         <div id = "description"></div>
         
     </div>
+
+
+
+
+
+    <script>
+
+            var taskTypes = [
+                {
+                    type: 'Electrician',
+                    tasks: ['Fix light', 'Fix something else']
+                },
+                {
+                    type: 'Plumber',
+                    tasks: ['Unlock a toilet', 'Unlock a sink', 'Fix water leak']
+                },
+                {
+                    type: 'Housekeeper',
+                    tasks: ['Iron closes', 'Clean bathroom', 'Cook dinner']
+                }
+            ]
+            
+            
+            function getTasks() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', 'http://localhost:3333/alltasks', true) ;
+                xhr.onload = function(){
+                    var createdTasks = JSON.parse(this.response);
+                    console.log(createdTasks);
+                    var createdTasksDivs;
+                    
+                    var createdTasksBlock = document.getElementById('created_tasks');
+                    console.log(createdTasksBlock);
+                    createdTasksDivs = new Array;
+                    
+                    for (i in createdTasks){
+                        console.log(createdTasks[i]);
+                        createdTasksDivs[i] = document.createElement('div'); 
+                        let taskDate = parseDate(createdTasks[i].id);   
+                        console.log(createdTasks[i].description);
+                        let text = `<div id=${createdTasks[i].id}><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
+                       
+                       createdTasksDivs[i].innerHTML = text;
+                        console.log(createdTasksDivs[i]);
+                        createdTasksBlock.append(createdTasksDivs[i]);                      
+                    }                    
+                    console.log(createdTasksDivs);
+                }
+                xhr.send();
+            }
+            
+            function parseDate(dateString){
+             let dateAsDate = new Date(Number(dateString));  
+             let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augest', 'September', 'October', 'November', 'December'];
+             let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesay', 'Thursday', 'Friday', 'Saturday'];
+             let month = months[dateAsDate.getMonth()];
+             let day = days[dateAsDate.getDay()];
+             let monthDay = dateAsDate.getDate();
+             let hours = dateAsDate.getHours() < 10 ? '0' + dateAsDate.getHours() : dateAsDate.getHours();
+             let minutes = dateAsDate.getMinutes() < 10 ? '0' + dateAsDate.getMinutes() : dateAsDate.getMinutes();
+             let seconds = dateAsDate.getSeconds() < 10 ? '0' + dateAsDate.getSeconds() : dateAsDate.getSeconds();  
+             return `${day},${month} ${monthDay}, ${hours}:${minutes}`;
+            }
+
+
+            function createTask() {
+               let newTaskButton =  document.getElementById('new_task');
+
+               newTaskButton.addEventListener('click', showNewTaskOptions, true)
+
+               function showNewTaskOptions(action) {
+
+                let taskOptions = document.getElementById('task_parameters');
+
+                }
+
+            }
+
+            
+
+            
+            getTasks();
+            
+            
+              </script>
+
+    
 </body>
 </html>
