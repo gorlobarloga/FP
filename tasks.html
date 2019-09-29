@@ -4,7 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Tasks</title> 
+    <style>
+    
+    #task_parameters {
+        display:none;
+        position: absolute;
+        left: 300px;
+        width: 400px;
+        top: 0;
+    }
 
+    .selected {
+        border: 1px solid gray;
+    }
+
+    #type div, #task div  {
+        display: inline-block;
+
+    }
+    
+    </style>
  
   
 </head>
@@ -15,14 +34,25 @@
         <div id="created_tasks">
     </div>
     <div id="task_parameters">
-        <div id="summary">
+        <div>
+            <p>TASK SUMMARY</p>
+            <div id="summary"></div>
             <button></button>>
         </div>
-        <div ><input type = 'text' id = 'location'></input></div>
-        <div id = "type"></div>
-        <div id = "task"></div>
-        <div id = "description"></div>
-        
+        <div >
+            <p>TASK LOCTION</p>
+            <input type = 'text' id = 'location'></input>
+        </div>
+        <div id = "type">
+            <p>SERVICE TYPE</p>
+        </div>
+        <div id = "task">
+            <p></p>
+        </div>
+        <div> 
+            <p>TASK DESCRIPTION</p>
+            <input type = 'text' id = 'description'></input>
+        </div>        
     </div>
 
 
@@ -93,11 +123,64 @@
                 var taskType;
                 var taskSubtype;
                 var taskDescription;
-                let newTaskButton =  document.getElementById('new_task');
+                var taskLocation;
+                let createTaskButton =  document.getElementById('summary').querySelector('button');
+
+                let newTaskButton =  document.getElementById('new_task')
+                console.log(newTaskButton);
+                createTaskButton.innerText = 'CREATE TASK';
+
+                createTaskButton.addEventListener('click', addTask, true);
+                    
+                function addTask(){
+
+
+                  taskDescription = document.getElementById().innerText;
+                  
+                  
+
+
+
+
+
+                    let xhr = new XMLHttpRequest();
+                xhr.open('GET', 'http://localhost:3333/alltasks', true) ;
+                xhr.onload = function(){
+                    var createdTasks = JSON.parse(this.response);
+                    
+                    var createdTasksDivs;
+                    
+                    var createdTasksBlock = document.getElementById('created_tasks');
+                    
+                    createdTasksDivs = new Array;
+                    
+                    for (i in createdTasks){
+                       
+                        createdTasksDivs[i] = document.createElement('div'); 
+                        let taskDate = parseDate(createdTasks[i].id);   
+                        
+                        let text = `<div id=${createdTasks[i].id}><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
+                       
+                       createdTasksDivs[i].innerHTML = text;
+                        
+                        createdTasksBlock.append(createdTasksDivs[i]);                      
+                    }                    
+                    
+                }
+                xhr.send();
+
+
+
+
+
+
+                    ////////
+                }
 
                newTaskButton.addEventListener('click', showNewTaskOptions, true);
 
                function showNewTaskOptions(action) {
+                    document.getElementById('task_parameters').style.display = 'block';
 
                     let taskOptions = document.getElementById('type');
                     var taskTypeDivs = new Array;
@@ -114,27 +197,54 @@
                     function selectType(e) {
                         e.preventDefault();
                         taskType = e.currentTarget.innerText;
+                        e.currentTarget.setAttribute('class','selected');
+                        document.getElementById('summary').innerText = getTaskSummary();
                         showSubtypes(taskType);
                     } 
                     
                     function showSubtypes(selectedType){
                         var subTypesDiv = document.getElementById('task');
+                        subTypesDiv.innerHTML = '';
+                        let title = document.createElement('p');
+                        subTypesDiv.append(title);
+                        title.innerText = `${taskType.toUpperCase()} TASKS`;
                         var selectedSubtypes = taskTypes.find(task => task.type === selectedType);
                         var subTypesDivs = new Array;
-                        console.log(selectedSubtypes);
-
+                        
                         for (let i in selectedSubtypes.tasks) {
                             subTypesDivs[i] = document.createElement('div');
                             subTypesDivs[i].innerHTML =  selectedSubtypes.tasks[i];
+                            subTypesDivs[i].addEventListener('click', selectSubType, true);
                             subTypesDiv.append(subTypesDivs[i]); 
                         }
 
+                    }
+
+                    function selectSubType(e) {
+                        e.preventDefault();
+                        taskSubtype = e.currentTarget.innerText;
+                        e.currentTarget.setAttribute('class','selected'); 
+                        document.getElementById('summary').innerText = getTaskSummary();                       
                     }
                 
 
                 }
 
+
+                document.getElementById('description').addEventListener('change', e => {
+                    e.preventDefault();
+                    document.getElementById('summary').innerText = getTaskSummary();
+                })
+
+                function getTaskSummary(){
+                    var taskLocation = document.getdocumentById('location').innerText;
+                    var taskDescription = document.getElementById('description').innerText;
+                    return `I need a ${taskType} to ${taskSubtype}, ${taskDescription}`;
+                }
+
             }
+
+            
 
             
 
