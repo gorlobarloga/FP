@@ -34,10 +34,10 @@
         <div id="created_tasks">
     </div>
     <div id="task_parameters">
-        <div>
+        <div id = 'summary_block'>
             <p>TASK SUMMARY</p>
             <div id="summary"></div>
-            <button></button>>
+            <div id="submit"></div>
         </div>
         <div >
             <p>TASK LOCTION</p>
@@ -81,26 +81,18 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open('GET', 'http://localhost:3333/alltasks', true) ;
                 xhr.onload = function(){
-                    var createdTasks = JSON.parse(this.response);
-                    
-                    var createdTasksDivs;
-                    
-                    var createdTasksBlock = document.getElementById('created_tasks');
-                    
+                    var createdTasks = JSON.parse(this.response);                    
+                    var createdTasksDivs;                    
+                    var createdTasksBlock = document.getElementById('created_tasks');                    
                     createdTasksDivs = new Array;
                     
-                    for (i in createdTasks){
-                       
+                    for (i in createdTasks){                       
                         createdTasksDivs[i] = document.createElement('div'); 
-                        let taskDate = parseDate(createdTasks[i].id);   
-                        
+                        let taskDate = parseDate(createdTasks[i].id);                          
                         let text = `<div id=${createdTasks[i].id}><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
-                       
-                       createdTasksDivs[i].innerHTML = text;
-                        
+                        createdTasksDivs[i].innerHTML = text;                        
                         createdTasksBlock.append(createdTasksDivs[i]);                      
-                    }                    
-                    
+                    }               
                 }
                 xhr.send();
             }
@@ -124,75 +116,21 @@
                 var taskSubtype;
                 var taskDescription;
                 var taskLocation;
-                let createTaskButton =  document.getElementById('summary').querySelector('button');
+               
+               let newTaskButton =  document.getElementById('new_task'); 
+               newTaskButton.addEventListener('click', showNewTaskOptions, false);
 
-                let newTaskButton =  document.getElementById('new_task')
-                console.log(newTaskButton);
-                createTaskButton.innerText = 'CREATE TASK';
-
-                createTaskButton.addEventListener('click', addTask, true);
-                    
-                function addTask(){
-
-
-                  taskDescription = document.getElementById().innerText;
-                  
-                  
-
-
-
-
-
-                    let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://localhost:3333/alltasks', true) ;
-                xhr.onload = function(){
-                    var createdTasks = JSON.parse(this.response);
-                    
-                    var createdTasksDivs;
-                    
-                    var createdTasksBlock = document.getElementById('created_tasks');
-                    
-                    createdTasksDivs = new Array;
-                    
-                    for (i in createdTasks){
-                       
-                        createdTasksDivs[i] = document.createElement('div'); 
-                        let taskDate = parseDate(createdTasks[i].id);   
-                        
-                        let text = `<div id=${createdTasks[i].id}><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
-                       
-                       createdTasksDivs[i].innerHTML = text;
-                        
-                        createdTasksBlock.append(createdTasksDivs[i]);                      
-                    }                    
-                    
-                }
-                xhr.send();
-
-
-
-
-
-
-                    ////////
-                }
-
-               newTaskButton.addEventListener('click', showNewTaskOptions, true);
-
-               function showNewTaskOptions(action) {
+               function showNewTaskOptions(e) {
+                   e.preventDefault();
                     document.getElementById('task_parameters').style.display = 'block';
-
                     let taskOptions = document.getElementById('type');
                     var taskTypeDivs = new Array;
-
                     for (let i in taskTypes) {
                         taskTypeDivs[i] = document.createElement('div');
                         taskTypeDivs[i].innerHTML = taskTypes[i].type;
                         taskTypeDivs[i].addEventListener('click', selectType, true);
                         taskOptions.append(taskTypeDivs[i]);    
-                    }
-
-                    
+                    }                
 
                     function selectType(e) {
                         e.preventDefault();
@@ -201,7 +139,7 @@
                         document.getElementById('summary').innerText = getTaskSummary();
                         showSubtypes(taskType);
                     } 
-                    
+
                     function showSubtypes(selectedType){
                         var subTypesDiv = document.getElementById('task');
                         subTypesDiv.innerHTML = '';
@@ -217,7 +155,6 @@
                             subTypesDivs[i].addEventListener('click', selectSubType, true);
                             subTypesDiv.append(subTypesDivs[i]); 
                         }
-
                     }
 
                     function selectSubType(e) {
@@ -230,17 +167,50 @@
 
                 }
 
-
-                document.getElementById('description').addEventListener('change', e => {
-                    e.preventDefault();
-                    document.getElementById('summary').innerText = getTaskSummary();
-                })
-
                 function getTaskSummary(){
-                    var taskLocation = document.getdocumentById('location').innerText;
-                    var taskDescription = document.getElementById('description').innerText;
-                    return `I need a ${taskType} to ${taskSubtype}, ${taskDescription}`;
+                    taskDescription = document.getElementById('description').value;                    
+                    return `I need a ${taskType} to ${taskSubtype}, ${taskDescription}.`;
                 }
+
+                document.getElementById('description').addEventListener('change', (e) => {
+                    taskDescription = document.getElementById('description').value;
+                    document.getElementById('summary').innerText = getTaskSummary();
+                }, false);
+
+
+                var createTaskButton =  document.getElementById('submit'); 
+                
+                console.log(createTaskButton);
+
+                createTaskButton.innerText = 'CREATE TASK';
+
+                function newTask (location, type, subType, description) {
+                    this.id = Date.now().toString();
+                    this.location = location;
+                    this.type = type;
+                    this.subType = subType;
+                    this.description = description;
+                 }
+                
+                    
+                function addTask(e){
+                    e.preventDefault();
+                    taskLocation = document.getElementById('location').value; 
+                    var task= new newTask(taskLocation, taskType, taskSubtype, taskDescription);
+                    console.log(JSON.stringify(task));
+
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'http://localhost:3333/tasks', true) ;
+                   xhr.onload = function(){                    
+                    }
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.send(JSON.stringify(task));                 
+                }
+
+                createTaskButton.addEventListener('click',addTask, false);
+
+
+                
 
             }
 
