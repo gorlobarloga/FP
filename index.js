@@ -3,6 +3,8 @@ const PORT = process.env.PORT || 3000;
 const app = exp();
 const fs = require('fs');
 const bp = require('body-parser');
+const http = require('http');
+
 app.use(bp.json());
 app.use(bp.urlencoded({extend: true}));
 
@@ -19,18 +21,25 @@ catch (err) {
 
 
 app.get('/', (req, res)=> {
-    fs.readFile('./tasks.txt', 'utf8', (error, content)=>{
+    var tasks;
+    res.sendfile('tasks.html');
+})
+
+app.get('/tasks', (req, res)=> {
+        fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
         }
-        let tasks = JSON.parse(content);           
-    })
-    res.send(tasks);
+        //console.log(content);
+        tasks = JSON.parse(content); 
+        console.log(tasks);
+        res.send(tasks);          
+    })    
 })
 
-app.get('/:id', (req, res)=> {
-    fs.readFile('./tasks.txt', 'utf8', (error, content)=>{
+app.get('tasks/:id', (req, res)=> {
+    fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
@@ -41,11 +50,10 @@ app.get('/:id', (req, res)=> {
     res.send(task);
 })
 
-
-app.post('/', (req, res)=>{
+app.post('/tasks', (req, res)=>{
     let task = req.body;
 
-    fs.readFile('./tasks.txt', 'utf8', (error, content)=>{
+    fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
@@ -58,7 +66,7 @@ app.post('/', (req, res)=>{
 
 
 app.put('/:id', (req, res)=> {
-    fs.readFile('./tasks.txt', 'utf8', (error, content)=>{
+    fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
@@ -72,7 +80,7 @@ app.put('/:id', (req, res)=> {
 })
 
 app.delete('/:id', (req, res)=> {
-    fs.readFile('./tasks.txt', 'utf8', (error, content)=>{
+    fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
