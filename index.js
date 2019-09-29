@@ -6,15 +6,16 @@ const bp = require('body-parser');
 app.use(bp.json());
 app.use(bp.urlencoded({extend: true}));
 
-
+/*
 try {
     fs.statSync('./tasks.txt');
     }
 catch (err) {
   if (err.code === 'ENOENT') {
-    fs.writeFile()
+    fs.writeFile('./tasks.txt', '','utf8' )
   }
 }
+*/
 
 
 app.get('/', (req, res)=> {
