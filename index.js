@@ -14,7 +14,7 @@ try {
     }
 catch (err) {
   if (err.code === 'ENOENT') {
-    fs.writeFile('./tasks.txt', '', unction(err, result) {
+    fs.writeFile('./tasks.txt', '', (err, content )=> {
         if(err) console.log('error', err);
     } )
   }
@@ -32,7 +32,6 @@ app.get('/alltasks', (req, res)=> {
             return
         }
         tasks = JSON.parse(content); 
-        console.log(tasks);
         res.send(tasks);          
     })    
 })
@@ -61,7 +60,7 @@ app.post('/tasks', (req, res)=>{
         let tasks = JSON.parse(content);                  
     })
     tasks.push(task);
-    fs.writeFile('./tasks.txt', JSON.stringify(tasks), function(err, result) {
+    fs.writeFile('./tasks.txt', JSON.stringify(tasks),(err, content ) => {
         if(err) console.log('error', err);
     });
     res.send(JSON.stringify(tasks));
@@ -80,22 +79,29 @@ app.put('/:id', (req, res)=> {
 
     let index = tasks.find(task => task.id === Number(req.params.id));
     tasks[index] = req.body;
-    fs.writeFile('./tasks.txt', JSON.stringify(tasks), unction(err, result) {
+    fs.writeFile('./tasks.txt', JSON.stringify(tasks), (err, content ) => {
         if(err) console.log('error', err);
     });    
 })
 
 app.delete('/:id', (req, res)=> {
+    
+    var tasks;
     fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
         }
-        let tasks = JSON.parse(content);          
+        
+        tasks = JSON.parse(content); 
+        console.log(String(req.params.id));
+        tasks = tasks.filter(task => task.id !== String(req.params.id));
+        fs.writeFile('./tasks.txt', JSON.stringify(tasks), (err, content ) => {
+            if(err) console.log('error', err);
+         })         
     })
 
-    tasks = tasks.filter(task => task.id !== Number(req.params.id));
-    fs.writeFile('./tasks.txt', JSON.stringify(tasks))
+    
 })
 
 

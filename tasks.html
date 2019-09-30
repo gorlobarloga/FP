@@ -89,41 +89,59 @@
       
           function reflectCreatedTasks(createdTasks){
             var createdTasksDivs = new Array;;                    
-                var createdTasksBlock = document.getElementById('created_tasks');                
+                var createdTasksBlock = document.getElementById('created_tasks');   
+                
+                function deleteTask(e){
+                      
+                    let element = e.currentTarget;
+                    
+                    let id = element.parentNode.parentNode.id;
+                     
+                    let xhr = new XMLHttpRequest();
+                        xhr.open('DELETE', `http://localhost:3333/${id}`, true) ;
+                        xhr.onload = function(){
+                        location.reload(true); 
+                        
+                    }
+                    xhr.send(); 
+                    
+                }
 
                 for (i in createdTasks){                       
                     createdTasksDivs[i] = document.createElement('div'); 
-                    let taskDate = parseDate(createdTasks[i].id);                          
-                    let text = `<div id=${createdTasks[i].id} class="created_task"><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
-                    createdTasksDivs[i].innerHTML = text;                        
-                    createdTasksBlock.append(createdTasksDivs[i]);                      
-                }      
+                    let taskDate = parseDate(createdTasks[i].id);  
+                    createdTasksDivs[i].id=createdTasks[i].id;
+                    createdTasksDivs[i].className = ('created_task');
+                    createdTasksBlock.append(createdTasksDivs[i]); 
+                    
+                    let dateDiv = document.createElement('div');
+                    dateDiv.className = ('date');
+                    dateDiv.innerText = taskDate;
+                    createdTasksDivs[i].append(dateDiv);
+
+                    let descriptionDiv = document.createElement('div');
+                    descriptionDiv.className = ('description');
+                    descriptionDiv.innerText = createdTasks[i].description;
+                    createdTasksDivs[i].append(descriptionDiv);
+
+                    let buttonsDiv = document.createElement('div');
+                    buttonsDiv.className = ('buttons');
+                    createdTasksDivs[i].append(buttonsDiv);
+
+                    let deleteButton = document.createElement('button');
+                    deleteButton.innerText = 'Delete';
+                    buttonsDiv.append(deleteButton);
+                    deleteButton.addEventListener('click', deleteTask, false);
+
+                    let editButton = document.createElement('button');
+                    editButton.innerText = 'Edit';
+                    buttonsDiv.append(editButton);               
+                }  
+                
+                
           }
       
-             //!!!!!!
-            function addActionToButtons(){
-             document.getElementByClassName("create_task").querySelector('button:contains("Delete")').addEventListener('click', deleteTask, false); 
-             document.getElementByClassName("create_task").querySelector('button:contains("Edit")').addEventListener('click', showTaskProperties, false);
-             
-              function deleteTask(e){
-              var element = e.currentTarget.parentNode().id;  
-              let xhr = new XMLHttpRequest();
-                xhr.open('DELETE', `http://localhost:3333/${element}`, true) ;
-                xhr.onload = function(){
-                  //reload page
-              }
-              xhr.send(); 
-              
-             }
-              
-              function showTaskProperties(){
-                
-              }
-            }
-      
-      //!!!!  Also reload page after modifications with tasks
-      
-
+           
       
       
       
@@ -165,10 +183,15 @@
                     }                
 
                     function selectType(e) {
-                        e.preventDefault();
+                        e.preventDefault();                     
+
+                        if (taskType !== undefined) {
+                        let currentSelected = document.getElementsByClassName('selected_type');                        
+                        currentSelected.classList.remove('selected_type');
+                        }
                         taskType = e.currentTarget.innerText;
-                        document.getElementsByClassName('selected').className.remove('selected');
-                        e.currentTarget.setAttribute('class','selected');
+
+                        e.currentTarget.setAttribute('class','selected_type');
                         document.getElementById('summary').innerText = getTaskSummary();
                         showSubtypes(taskType);
                     } 
@@ -192,12 +215,14 @@
 
                     function selectSubType(e) {
                         e.preventDefault();
-                        taskSubtype = e.currentTarget.innerText;
-                        // Select only subtype fix document.getElementsByClassName('selected').querySelector('').className.remove('selected');
-                        e.currentTarget.setAttribute('class','selected'); 
+                        if (taskSubtype !== undefined) {
+                        let selectedTask = document.getElementsByClassName('selected_task');
+                        currentSelected.classList.remove('selected_task');
+                        }
+                        taskSubtype = e.currentTarget.innerText;                        
+                        e.currentTarget.setAttribute('class','selected_task'); 
                         document.getElementById('summary').innerText = getTaskSummary();                       
-                    }
-                
+                    }   
 
                 }
 
@@ -238,7 +263,8 @@
                    xhr.onload = function(){                    
                     }
                     xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.send(JSON.stringify(task));                 
+                    xhr.send(JSON.stringify(task));  
+                    location.reload(true);               
                 }
 
                 createTaskButton.addEventListener('click',addTask, false);
