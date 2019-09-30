@@ -91,21 +91,38 @@
             var createdTasksDivs = new Array;;                    
                 var createdTasksBlock = document.getElementById('created_tasks');   
                 
-                function deleteTask(e){
-                      
-                    let element = e.currentTarget;
-                    
-                    let id = element.parentNode.parentNode.id;
-                     
+                function deleteTask(e){                      
+                    let element = e.currentTarget;                    
+                    let id = element.parentNode.parentNode.id;                     
                     let xhr = new XMLHttpRequest();
                         xhr.open('DELETE', `http://localhost:3333/${id}`, true) ;
                         xhr.onload = function(){
-                        location.reload(true); 
-                        
+                        location.reload(true);                         
                     }
-                    xhr.send(); 
-                    
+                    xhr.send();                     
                 }
+
+
+                
+                function editTask(e){                      
+                      let element = e.currentTarget;                      
+                      let id = element.parentNode.parentNode.id;                       
+                      let xhr = new XMLHttpRequest();
+                      
+                        xhr.open('GET', `http://localhost:3333/${id}`, true) ;
+                        xhr.onload = function(){
+                            console.log(this.response);
+                    
+                        var taskToEdit = JSON.parse(this.response);
+                        editTaskList(taskToEdit) ;             
+                          
+                      }
+                      xhr.send(); 
+                      
+                  } 
+
+
+
 
                 for (i in createdTasks){                       
                     createdTasksDivs[i] = document.createElement('div'); 
@@ -135,7 +152,8 @@
 
                     let editButton = document.createElement('button');
                     editButton.innerText = 'Edit';
-                    buttonsDiv.append(editButton);               
+                    buttonsDiv.append(editButton);  
+                    editButton.addEventListener('click', editTask, false);             
                 }  
                 
                 
@@ -161,7 +179,8 @@
             }
 
 
-            function createTask() {
+            function editTaskList() {
+                console.log(arguments);
                 var taskType;
                 var taskSubtype;
                 var taskDescription;
@@ -280,7 +299,7 @@
 
             
             getTasks();
-            createTask();
+            editTaskList(); ///Should be put to event listener of the new task
             
             
               </script>

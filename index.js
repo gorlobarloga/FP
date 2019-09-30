@@ -36,16 +36,18 @@ app.get('/alltasks', (req, res)=> {
     })    
 })
 
-app.get('tasks/:id', (req, res)=> {
+app.get('/:id', (req, res)=> {
     fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
         }
         let tasks = JSON.parse(content);  
-        let task = tasks.find(task => task.id === Number(req.params.id));         
-    })
-    res.send(task);
+        console.log(req.params.id);
+        let task = tasks.find(task => task.id === String(req.params.id));
+        console.log(task);     
+        res.send(task);    
+    })    
 })
 
 app.post('/tasks', (req, res)=>{
@@ -73,35 +75,30 @@ app.put('/:id', (req, res)=> {
             console.log("Error reading file:", err)
             return
         }
-        let tasks = JSON.parse(content);  
-                 
-    })
+        let tasks = JSON.parse(content);
+        let index = tasks.find(task => task.id === String(req.params.id));
 
-    let index = tasks.find(task => task.id === Number(req.params.id));
-    tasks[index] = req.body;
-    fs.writeFile('./tasks.txt', JSON.stringify(tasks), (err, content ) => {
-        if(err) console.log('error', err);
-    });    
+        tasks[index] = req.body;
+        fs.writeFile('./tasks.txt', JSON.stringify(tasks), (err, content ) => {
+            if(err) console.log('error', err);
+     });  
+                 
+    })        
 })
 
-app.delete('/:id', (req, res)=> {
-    
-    var tasks;
+app.delete('/:id', (req, res)=> {       
     fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
             console.log("Error reading file:", err)
             return
         }
         
-        tasks = JSON.parse(content); 
-        console.log(String(req.params.id));
+        let tasks = JSON.parse(content); 
         tasks = tasks.filter(task => task.id !== String(req.params.id));
         fs.writeFile('./tasks.txt', JSON.stringify(tasks), (err, content ) => {
             if(err) console.log('error', err);
          })         
-    })
-
-    
+    })    
 })
 
 
