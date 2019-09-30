@@ -8,16 +8,17 @@ const http = require('http');
 app.use(bp.json());
 app.use(bp.urlencoded({extend: true}));
 
-/*
+
 try {
     fs.statSync('./tasks.txt');
     }
 catch (err) {
   if (err.code === 'ENOENT') {
-    fs.writeFile('./tasks.txt', '','utf8' )
+    fs.writeFile('./tasks.txt', '', unction(err, result) {
+        if(err) console.log('error', err);
+    } )
   }
 }
-*/
 
 
 app.get('/', (req, res)=> {
@@ -79,7 +80,9 @@ app.put('/:id', (req, res)=> {
 
     let index = tasks.find(task => task.id === Number(req.params.id));
     tasks[index] = req.body;
-    fs.writeFile('./tasks.txt', JSON.stringify(tasks));    
+    fs.writeFile('./tasks.txt', JSON.stringify(tasks), unction(err, result) {
+        if(err) console.log('error', err);
+    });    
 })
 
 app.delete('/:id', (req, res)=> {
