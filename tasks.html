@@ -81,22 +81,54 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open('GET', 'http://localhost:3333/alltasks', true) ;
                 xhr.onload = function(){
-                    var createdTasks = JSON.parse(this.response);                    
-                    var createdTasksDivs;                    
-                    var createdTasksBlock = document.getElementById('created_tasks');                    
-                    createdTasksDivs = new Array;
-                    
-                    for (i in createdTasks){                       
-                        createdTasksDivs[i] = document.createElement('div'); 
-                        let taskDate = parseDate(createdTasks[i].id);                          
-                        let text = `<div id=${createdTasks[i].id}><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
-                        createdTasksDivs[i].innerHTML = text;                        
-                        createdTasksBlock.append(createdTasksDivs[i]);                      
-                    }               
+                    var createdTasks = JSON.parse(this.response);   
+                    reflectCreatedTasks(createdTasks);                             
                 }
                 xhr.send();
             }
-            
+      
+          function reflectCreatedTasks(createdTasks){
+            var createdTasksDivs = new Array;;                    
+                var createdTasksBlock = document.getElementById('created_tasks');                
+
+                for (i in createdTasks){                       
+                    createdTasksDivs[i] = document.createElement('div'); 
+                    let taskDate = parseDate(createdTasks[i].id);                          
+                    let text = `<div id=${createdTasks[i].id} class="created_task"><div class='date'>${taskDate}</div><div class='description'>${createdTasks[i].description}</div><div class='buttons'><button>Edit</button><button>Delete</button></div></div>`; 
+                    createdTasksDivs[i].innerHTML = text;                        
+                    createdTasksBlock.append(createdTasksDivs[i]);                      
+                }      
+          }
+      
+             //!!!!!!
+            function addActionToButtons(){
+             document.getElementByClassName("create_task").querySelector('button:contains("Delete")').addEventListener('click', deleteTask, false); 
+             document.getElementByClassName("create_task").querySelector('button:contains("Edit")').addEventListener('click', showTaskProperties, false);
+             
+              function deleteTask(e){
+              var element = e.currentTarget.parentNode().id;  
+              let xhr = new XMLHttpRequest();
+                xhr.open('DELETE', `http://localhost:3333/${element}`, true) ;
+                xhr.onload = function(){
+                  //reload page
+              }
+              xhr.send(); 
+              
+             }
+              
+              function showTaskProperties(){
+                
+              }
+            }
+      
+      //!!!!  Also reload page after modifications with tasks
+      
+
+      
+      
+      
+      
+      
             function parseDate(dateString){
              let dateAsDate = new Date(Number(dateString));  
              let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augest', 'September', 'October', 'November', 'December'];
@@ -135,6 +167,7 @@
                     function selectType(e) {
                         e.preventDefault();
                         taskType = e.currentTarget.innerText;
+                        document.getElementsByClassName('selected').className.remove('selected');
                         e.currentTarget.setAttribute('class','selected');
                         document.getElementById('summary').innerText = getTaskSummary();
                         showSubtypes(taskType);
@@ -160,6 +193,7 @@
                     function selectSubType(e) {
                         e.preventDefault();
                         taskSubtype = e.currentTarget.innerText;
+                        // Select only subtype fix document.getElementsByClassName('selected').querySelector('').className.remove('selected');
                         e.currentTarget.setAttribute('class','selected'); 
                         document.getElementById('summary').innerText = getTaskSummary();                       
                     }
