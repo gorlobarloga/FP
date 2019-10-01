@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Tasks</title> 
-  <script src = "getTasks.js"></script>
+  <script src = "./getTasks.js"></script>
  
     <style>
     
@@ -95,8 +95,12 @@
         var createdTasksBlock = document.getElementById('created_tasks'); 
       
         let newTaskButton =  document.getElementById('new_task'); 
-        var reflectNe
-        newTaskButton.addEventListener('click', editTaskList, false);
+        var reflectNewTask;
+        //console.log();
+        function openNewTaskOptions(){
+            editTaskList();
+        }
+        newTaskButton.addEventListener('click', openNewTaskOptions, false);
         
         function deleteTask(e){                      
             let element = e.currentTarget;                    
@@ -171,20 +175,71 @@
     
     function editTaskList(task) {
         console.log(arguments);
-      if (arguments.length == 0) {
         var taskType;
         var taskSubtype;
         var taskDescription;
         var taskLocation;
-       } else {
-       
+        
+        function setTaskSummary(descr){
+            if(arguments.length == 0) {
+                descr = document.getElementById('description').value;
+            }                    
+            document.getElementById('summary').value = `I need a ${taskType} to ${taskSubtype}, ${descr}.`;
+        }
+
+        function reflectExistingTaskOptions(taskType, taskLocation, taskSubtype, taskDescription) {     
+            showTaskOptions();
+            showSubtypes(taskType);
+
+            let types = document.getElementById('type').childNodes;
+            for (let i in types){
+                if (types[i].innerHTML == taskType){
+                    types[i].setAttribute('class', 'selected_type');
+                }
+            }
+
+            let tasks = document.getElementById('task').childNodes;            
+            for (let i in tasks){
+                if (tasks[i].innerHTML == taskSubtype){
+                    tasks[i].setAttribute('class', 'selected_task');
+                }
+            }
+
+            document.getElementById('location').value = taskLocation;
+            document.getElementById('description').value = taskDescription; 
+            setTaskSummary(taskDescription);
+        }
+
+        
+
+        if (arguments.length !== 0) {
+            
+            var selecetedTask = arguments[0];
+            console.log(task);
+            taskType = task.type;
+            taskLocation = task.location;
+            taskSubtype = task.subType;            
+            taskDescription = task.description;
+
+            reflectExistingTaskOptions(taskType, taskLocation, taskSubtype, taskDescription); 
+            getTaskSummary(taskDescription);      
+        
+
+
+       }  else {
+            showTaskOptions();
+
        }
-          
+
+       
+       
+
        //let newTaskButton =  document.getElementById('new_task'); 
        //newTaskButton.addEventListener('click', showNewTaskOptions, false);
+        
+
     
-       function showNewTaskOptions() {
-          
+       function showTaskOptions() {          
             document.getElementById('task_parameters').style.display = 'block';
             let taskOptions = document.getElementById('type');
             var taskTypeDivs = new Array;
@@ -194,20 +249,20 @@
                 taskTypeDivs[i].addEventListener('click', selectType, true);
                 taskOptions.append(taskTypeDivs[i]);    
             }                
-    
+        }
+
             function selectType(e) {
                 e.preventDefault();                     
-    
+
                 if (taskType !== undefined) {
-                let currentSelected = document.getElementsByClassName('selected_type');                        
-                currentSelected.classList.remove('selected_type');
+                    let currentSelected = document.getElementsByClassName('selected_type');                        
+                    currentSelected.classList.remove('selected_type');
                 }
                 taskType = e.currentTarget.innerText;
-    
                 e.currentTarget.setAttribute('class','selected_type');
                 document.getElementById('summary').innerText = getTaskSummary();
                 showSubtypes(taskType);
-            } 
+            }
     
             function showSubtypes(selectedType){
                 var subTypesDiv = document.getElementById('task');
@@ -224,8 +279,9 @@
                     subTypesDivs[i].addEventListener('click', selectSubType, true);
                     subTypesDiv.append(subTypesDivs[i]); 
                 }
-            }
-    
+            }    
+            
+
             function selectSubType(e) {
                 e.preventDefault();
                 if (taskSubtype !== undefined) {
@@ -236,18 +292,15 @@
                 e.currentTarget.setAttribute('class','selected_task'); 
                 document.getElementById('summary').innerText = getTaskSummary();                       
             }     
-        }
+        
     
-        function getTaskSummary(){
-            taskDescription = document.getElementById('description').value;                    
-            return `I need a ${taskType} to ${taskSubtype}, ${taskDescription}.`;
-        }
+            
     
-        document.getElementById('description').addEventListener('change', (e) => {
-            taskDescription = document.getElementById('description').value;
-            document.getElementById('summary').innerText = getTaskSummary();
-        }, false);
-    
+            document.getElementById('description').addEventListener('change', (e) => {
+                taskDescription = document.getElementById('description').value;
+                document.getElementById('summary').innerText = getTaskSummary();
+            }, false);
+        
     
         var createTaskButton =  document.getElementById('submit');      
     
@@ -279,8 +332,12 @@
         createTaskButton.addEventListener('click',addTask, false); 
     }
      
+
+
+
+
     getTasks();
-    editTaskList(); ///Should be put to event listener of the new task
+    //editTaskList(); ///Should be put to event listener of the new task
   </script> 
 </body>
 </html>
