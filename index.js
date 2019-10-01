@@ -3,8 +3,10 @@ const PORT = process.env.PORT || 3000;
 const app = exp();
 const fs = require('fs');
 const bp = require('body-parser');
+
 const http = require('http');
-//const mainscript = require('./getTasks.js');
+var requirejs = require('requirejs');
+const mainscript = require('./getTasks');
 
 app.use(bp.json());
 app.use(bp.urlencoded({extend: true}));
@@ -53,7 +55,7 @@ app.get('/:id', (req, res)=> {
 
 app.post('/tasks', (req, res)=>{
 
-    console.log(req.body);
+    
     let task = req.body;
     fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
@@ -76,13 +78,12 @@ app.put('/:id', (req, res)=> {
             console.log("Error reading file:", err)
             return
         }
-        let tasks = JSON.parse(content);
-        let index = tasks.find(task => task.id === String(req.params.id));
-
+        let tasks = JSON.parse(content);        
+        let index = tasks.findIndex(task => task.id === String(req.params.id));
         tasks[index] = req.body;
         fs.writeFile('./tasks.txt', JSON.stringify(tasks), (err, content ) => {
             if(err) console.log('error', err);
-     });  
+        });  
                  
     })        
 })
