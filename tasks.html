@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Tasks</title> 
-  <script src = "./getTasks.js"></script>
+ 
  
     <style>
     
@@ -23,6 +23,7 @@
 
     #type div, #task div  {
         display: inline-block;
+        padding: 5px;
 
     }
     
@@ -70,7 +71,7 @@
         },
         {
             type: 'Plumber',
-            tasks: ['Unlock a toilet', 'Unlock a sink', 'Fix water leak']
+            tasks: ['Unlock a toilet', 'Unlock a sink', 'Fix water leak', 'fix pipes']
         },
         {
             type: 'Housekeeper',
@@ -215,14 +216,14 @@
         if (arguments.length !== 0) {
             
             var selecetedTask = arguments[0];
-            console.log(task);
+            //console.log(task);
             taskType = task.type;
             taskLocation = task.location;
             taskSubtype = task.subType;            
             taskDescription = task.description;
 
             reflectExistingTaskOptions(taskType, taskLocation, taskSubtype, taskDescription); 
-            getTaskSummary(taskDescription);      
+            setTaskSummary(taskDescription);      
         
 
 
@@ -255,15 +256,29 @@
                 e.preventDefault();                     
 
                 if (taskType !== undefined) {
-                    let currentSelected = document.getElementsByClassName('selected_type');                        
-                    currentSelected.classList.remove('selected_type');
+                    let selectedType = document.querySelector('.selected_type');                                 
+                    selectedType.classList.remove('selected_type');
                 }
                 taskType = e.currentTarget.innerText;
                 e.currentTarget.setAttribute('class','selected_type');
-                document.getElementById('summary').innerText = getTaskSummary();
+                setTaskSummary();
                 showSubtypes(taskType);
             }
     
+         
+
+            function selectSubType(e) {
+                e.preventDefault();
+                if (taskSubtype !== undefined) {
+                let selectedTask = document.querySelector('.selected_task');
+                selectedTask.classList.remove('selected_task');
+                }
+                taskSubtype = e.currentTarget.innerText;                        
+                e.currentTarget.setAttribute('class','selected_task'); 
+                setTaskSummary();                       
+            }     
+        
+            
             function showSubtypes(selectedType){
                 var subTypesDiv = document.getElementById('task');
                 subTypesDiv.innerHTML = '';
@@ -281,24 +296,11 @@
                 }
             }    
             
-
-            function selectSubType(e) {
-                e.preventDefault();
-                if (taskSubtype !== undefined) {
-                let selectedTask = document.getElementsByClassName('selected_task');
-                currentSelected.classList.remove('selected_task');
-                }
-                taskSubtype = e.currentTarget.innerText;                        
-                e.currentTarget.setAttribute('class','selected_task'); 
-                document.getElementById('summary').innerText = getTaskSummary();                       
-            }     
-        
-    
             
     
             document.getElementById('description').addEventListener('change', (e) => {
                 taskDescription = document.getElementById('description').value;
-                document.getElementById('summary').innerText = getTaskSummary();
+                setTaskSummary();
             }, false);
         
     
@@ -317,7 +319,7 @@
         function addTask(e){
             e.preventDefault();
             taskLocation = document.getElementById('location').value; 
-            var task= new newTask(taskLocation, taskType, taskSubtype, taskDescription);
+            var task = new newTask(taskLocation, taskType, taskSubtype, taskDescription);
             console.log(JSON.stringify(task));
     
             let xhr = new XMLHttpRequest();
@@ -328,8 +330,30 @@
             xhr.send(JSON.stringify(task));  
             location.reload(true);               
         }
+
+
+        function editTask(e){
+            e.preventDefault();
+            task.location = document.getElementById('location').value; 
+            task.description = taskDescription;
+            task.type = taskType;
+            task.task = taskSubtype;
+            
+            console.log(JSON.stringify(task));
+            console.log(`http://localhost:3333/${task.id}`);
     
-        createTaskButton.addEventListener('click',addTask, false); 
+            let xhr = new XMLHttpRequest();
+            xhr.open('PUT', `http://localhost:3333/${task.id}`, true) ;
+            xhr.onload = function(){
+                //location.reload(true);                     
+            }
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(task));  
+            
+        }
+
+    
+        createTaskButton.addEventListener('click',editTask, false); 
     }
      
 
@@ -339,5 +363,6 @@
     getTasks();
     //editTaskList(); ///Should be put to event listener of the new task
   </script> 
+  <script src='getTasks.js'></script>
 </body>
 </html>
