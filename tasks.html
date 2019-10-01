@@ -16,8 +16,9 @@
         top: 0;
     }
 
-    .selected {
+    .selected_type, .selected_task {
         border: 1px solid gray;
+        border-radius: 15px;
     }
 
     #type div, #task div  {
@@ -61,7 +62,8 @@
             
              
     
-   <script>var taskTypes = [
+   <script>
+     var taskTypes = [
         {
             type: 'Electrician',
             tasks: ['Fix light', 'Fix something else']
@@ -74,7 +76,7 @@
             type: 'Housekeeper',
             tasks: ['Iron closes', 'Clean bathroom', 'Cook dinner']
         }
-    ]
+    ];
     
     
     function getTasks() {
@@ -88,8 +90,13 @@
     }
     
     function reflectCreatedTasks(createdTasks){
-    var createdTasksDivs = new Array;;                    
-        var createdTasksBlock = document.getElementById('created_tasks');   
+        
+        var createdTasksDivs = new Array;                    
+        var createdTasksBlock = document.getElementById('created_tasks'); 
+      
+        let newTaskButton =  document.getElementById('new_task'); 
+        var reflectNe
+        newTaskButton.addEventListener('click', editTaskList, false);
         
         function deleteTask(e){                      
             let element = e.currentTarget;                    
@@ -100,9 +107,7 @@
                 location.reload(true);                         
             }
             xhr.send();                     
-        }
-    
-    
+        }    
         
         function editTask(e){                      
               let element = e.currentTarget;                      
@@ -111,18 +116,11 @@
               
                 xhr.open('GET', `http://localhost:3333/${id}`, true) ;
                 xhr.onload = function(){
-                    console.log(this.response);
-            
-                var taskToEdit = JSON.parse(this.response);
-                editTaskList(taskToEdit) ;             
-                  
+                  var taskToEdit = JSON.parse(this.response);
+                  editTaskList(taskToEdit) ; 
               }
-              xhr.send(); 
-              
-          } 
-    
-    
-    
+              xhr.send();               
+          }     
     
         for (i in createdTasks){                       
             createdTasksDivs[i] = document.createElement('div'); 
@@ -154,16 +152,8 @@
             editButton.innerText = 'Edit';
             buttonsDiv.append(editButton);  
             editButton.addEventListener('click', editTask, false);             
-        }  
-        
-        
-    }
-    
-    
-    
-    
-    
-    
+        }      
+    }    
     
     function parseDate(dateString){
      let dateAsDate = new Date(Number(dateString));  
@@ -179,18 +169,22 @@
     }
     
     
-    function editTaskList() {
+    function editTaskList(task) {
         console.log(arguments);
+      if (arguments.length == 0) {
         var taskType;
         var taskSubtype;
         var taskDescription;
         var taskLocation;
+       } else {
        
-       let newTaskButton =  document.getElementById('new_task'); 
-       newTaskButton.addEventListener('click', showNewTaskOptions, false);
+       }
+          
+       //let newTaskButton =  document.getElementById('new_task'); 
+       //newTaskButton.addEventListener('click', showNewTaskOptions, false);
     
-       function showNewTaskOptions(e) {
-           e.preventDefault();
+       function showNewTaskOptions() {
+          
             document.getElementById('task_parameters').style.display = 'block';
             let taskOptions = document.getElementById('type');
             var taskTypeDivs = new Array;
@@ -241,8 +235,7 @@
                 taskSubtype = e.currentTarget.innerText;                        
                 e.currentTarget.setAttribute('class','selected_task'); 
                 document.getElementById('summary').innerText = getTaskSummary();                       
-            }   
-    
+            }     
         }
     
         function getTaskSummary(){
@@ -256,9 +249,7 @@
         }, false);
     
     
-        var createTaskButton =  document.getElementById('submit'); 
-        
-        console.log(createTaskButton);
+        var createTaskButton =  document.getElementById('submit');      
     
         createTaskButton.innerText = 'CREATE TASK';
     
@@ -269,7 +260,6 @@
             this.subType = subType;
             this.description = description;
          }
-        
             
         function addTask(e){
             e.preventDefault();
@@ -286,10 +276,11 @@
             location.reload(true);               
         }
     
-        createTaskButton.addEventListener('click',addTask, false);  
-    
+        createTaskButton.addEventListener('click',addTask, false); 
     }
+     
     getTasks();
-    editTaskList(); ///Should be put to event listener of the new task</script> 
+    editTaskList(); ///Should be put to event listener of the new task
+  </script> 
 </body>
 </html>
