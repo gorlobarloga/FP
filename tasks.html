@@ -4,12 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Tasks</title> 
- 
- 
-    <style>
+  <style>
       
     body {
-      font-family: cursive; 
+      font-family: system-ui;
+      font-size: 10pt; 
       }
     
     #task_parameters {
@@ -25,10 +24,9 @@
         border-radius: 15px;
     }
 
-    #type div, #task div  {
+    #type div, #task div {
         display: inline-block;
         padding: 5px;
-
     }
       
       #tasks { 
@@ -41,28 +39,50 @@
       
       p {
         top-border: 1px solid #D3D3D3;
-        color: gray;      
+        color: gray; 
+        margin: 5px;     
+      }
+
+    .date {
+          color: gray;
+          font-size: 0.7em;
       }
       
-       #created_tasks div, #new_task, #task_parameters {
-         border: 1px solid gray;
-      }
-      
-       #created_tasks div {
-         margin: 5px;
-      }
-      
-      #created_tasks div button {
+    #new_task, #task_parameters {
+        border: 1px solid gray;
+        padding: 5px;
         margin: 5px;
-        background-color: #D3D3D3;
-      }
+    }
     
-    </style>
- 
-  
+    input {
+        width: 90%;
+    }
+
+    #created_tasks div, input {
+        margin: 5px;
+    }
+
+    #submit {
+        margin: 5px;
+        padding: 5px;
+        border: 1px solid gray;
+        width: 80px;
+    }
+    
+    .created_task {
+    border: 1px solid gray; 
+    margin: 5px;       
+    }
+
+    .buttons button{
+    margin: 5px;
+    
+    width: 60px;
+    
+    }
+</style>
 </head>
 <body>
-    
     <div id="tasks">
         <div id="new_task">+ NEW TASK</div> 
         <div id="created_tasks">
@@ -71,7 +91,7 @@
         <div id = 'summary_block'>
             <p>TASK SUMMARY</p>
             <div id="summary"></div>
-            <div id="submit"></div>
+            <div id="submit">SAVE TASK</div>
         </div>
         <div >
             <p>TASK LOCTION</p>
@@ -88,10 +108,6 @@
             <input type = 'text' id = 'description'></input>
         </div>        
     </div>
-   
-            
-            
-             
     
    <script>
      var taskTypes = [
@@ -108,7 +124,27 @@
             tasks: ['Iron closes', 'Clean bathroom', 'Cook dinner']
         }
     ];
-    
+
+    function newTask (location, type, subType, description) {
+            this.id = Date.now().toString();
+            this.location = location;
+            this.type = type;
+            this.subType = subType;
+            this.description = description;
+         }
+
+    function parseDate(dateString){
+        let dateAsDate = new Date(Number(dateString));  
+        let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augest', 'September', 'October', 'November', 'December'];
+        let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesay', 'Thursday', 'Friday', 'Saturday'];
+        let month = months[dateAsDate.getMonth()];
+        let day = days[dateAsDate.getDay()];
+        let monthDay = dateAsDate.getDate();
+        let hours = dateAsDate.getHours() < 10 ? '0' + dateAsDate.getHours() : dateAsDate.getHours();
+        let minutes = dateAsDate.getMinutes() < 10 ? '0' + dateAsDate.getMinutes() : dateAsDate.getMinutes();
+        let seconds = dateAsDate.getSeconds() < 10 ? '0' + dateAsDate.getSeconds() : dateAsDate.getSeconds();  
+        return `${day},${month} ${monthDay}, ${hours}:${minutes}`;
+    }
     
     function getTasks() {
         let xhr = new XMLHttpRequest();
@@ -121,42 +157,17 @@
     }
     
     function reflectCreatedTasks(createdTasks){
-        
         var createdTasksDivs = new Array;                    
         var createdTasksBlock = document.getElementById('created_tasks'); 
-      
         let newTaskButton =  document.getElementById('new_task'); 
         var reflectNewTask;
-        //console.log();
+        
         function openNewTaskOptions(){
             editTaskList();
-        }
+       }
+
         newTaskButton.addEventListener('click', openNewTaskOptions, false);
-        
-        function deleteTask(e){                      
-            let element = e.currentTarget;                    
-            let id = element.parentNode.parentNode.id;                     
-            let xhr = new XMLHttpRequest();
-                xhr.open('DELETE', `http://localhost:3333/${id}`, true) ;
-                xhr.onload = function(){
-                location.reload(true);                         
-            }
-            xhr.send();                     
-        }    
-        
-        function editTask(e){                      
-              let element = e.currentTarget;                      
-              let id = element.parentNode.parentNode.id;                       
-              let xhr = new XMLHttpRequest();
-              
-                xhr.open('GET', `http://localhost:3333/${id}`, true) ;
-                xhr.onload = function(){
-                  var taskToEdit = JSON.parse(this.response);
-                  editTaskList(taskToEdit) ; 
-              }
-              xhr.send();               
-          }     
-    
+
         for (i in createdTasks){                       
             createdTasksDivs[i] = document.createElement('div'); 
             let taskDate = parseDate(createdTasks[i].id);  
@@ -187,22 +198,32 @@
             editButton.innerText = 'Edit';
             buttonsDiv.append(editButton);  
             editButton.addEventListener('click', editTask, false);             
-        }      
+        } 
+        
+        function deleteTask(e){                      
+            let element = e.currentTarget;                    
+            let id = element.parentNode.parentNode.id;                     
+            let xhr = new XMLHttpRequest();
+                xhr.open('DELETE', `http://localhost:3333/${id}`, true) ;
+                xhr.onload = function(){                 
+                location.reload(true);                      
+            }
+            xhr.send();                     
+        }          
+        
+        function editTask(e){                      
+              let element = e.currentTarget;                      
+              let id = element.parentNode.parentNode.id;                       
+              let xhr = new XMLHttpRequest();
+              
+                xhr.open('GET', `http://localhost:3333/${id}`, true) ;
+                xhr.onload = function(){
+                  var taskToEdit = JSON.parse(this.response);
+                  editTaskList(taskToEdit) ; 
+              }
+              xhr.send();               
+          } 
     }    
-    
-    function parseDate(dateString){
-     let dateAsDate = new Date(Number(dateString));  
-     let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augest', 'September', 'October', 'November', 'December'];
-     let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesay', 'Thursday', 'Friday', 'Saturday'];
-     let month = months[dateAsDate.getMonth()];
-     let day = days[dateAsDate.getDay()];
-     let monthDay = dateAsDate.getDate();
-     let hours = dateAsDate.getHours() < 10 ? '0' + dateAsDate.getHours() : dateAsDate.getHours();
-     let minutes = dateAsDate.getMinutes() < 10 ? '0' + dateAsDate.getMinutes() : dateAsDate.getMinutes();
-     let seconds = dateAsDate.getSeconds() < 10 ? '0' + dateAsDate.getSeconds() : dateAsDate.getSeconds();  
-     return `${day},${month} ${monthDay}, ${hours}:${minutes}`;
-    }
-    
     
     function editTaskList(task) {
         console.log(arguments);
@@ -212,13 +233,15 @@
         var taskLocation;
         
         function setTaskSummary(descr){
-            if(arguments.length == 0) {
+            console.log('changeSummary')
+            if(!descr) {
                 descr = document.getElementById('description').value;
             }                    
-            document.getElementById('summary').value = `I need a ${taskType} to ${taskSubtype}, ${descr}.`;
+            document.getElementById('summary').innerText = `I need a ${taskType} to ${taskSubtype}, ${descr}.`;
         }
 
-        function reflectExistingTaskOptions(taskType, taskLocation, taskSubtype, taskDescription) {     
+        function reflectExistingTaskOptions(taskType, taskLocation, taskSubtype, taskDescription) { 
+         
             showTaskOptions();
             showSubtypes(taskType);
 
@@ -241,38 +264,31 @@
             setTaskSummary(taskDescription);
         }
 
-        
+        let createTaskButton = document.getElementById('submit');
 
         if (arguments.length !== 0) {
-            
             var selecetedTask = arguments[0];
-            //console.log(task);
             taskType = task.type;
             taskLocation = task.location;
             taskSubtype = task.subType;            
             taskDescription = task.description;
-
             reflectExistingTaskOptions(taskType, taskLocation, taskSubtype, taskDescription); 
-            setTaskSummary(taskDescription);      
-        
-
-
+            setTaskSummary(taskDescription);
+            createTaskButton.addEventListener('click', editTask, false);
        }  else {
             showTaskOptions();
-
+            createTaskButton.addEventListener('click', addTask, false);
        }
-
        
-       
-
-       //let newTaskButton =  document.getElementById('new_task'); 
-       //newTaskButton.addEventListener('click', showNewTaskOptions, false);
         
 
-    
        function showTaskOptions() {          
             document.getElementById('task_parameters').style.display = 'block';
-            let taskOptions = document.getElementById('type');
+            let taskOptions = document.getElementById('type'); 
+            taskOptions.innerHTML = '';
+            let optionsSummary = document.createElement('p');
+            optionsSummary.innerText = 'SERVICE TYPE';
+            taskOptions.append(optionsSummary);   
             var taskTypeDivs = new Array;
             for (let i in taskTypes) {
                 taskTypeDivs[i] = document.createElement('div');
@@ -282,85 +298,49 @@
             }                
         }
 
-            function selectType(e) {
-                e.preventDefault();                     
+        document.getElementById('description').addEventListener('change', (e) => {
+            taskDescription = document.getElementById('description').value;
+            setTaskSummary();
+        }, false);
 
-                if (taskType !== undefined) {
-                    let selectedType = document.querySelector('.selected_type');                                 
-                    selectedType.classList.remove('selected_type');
-                }
-                taskType = e.currentTarget.innerText;
-                e.currentTarget.setAttribute('class','selected_type');
-                setTaskSummary();
-                showSubtypes(taskType);
+        function selectType(e) {
+            e.preventDefault();       
+
+            if (taskType !== undefined) {
+                let selectedType = document.querySelector('.selected_type');                                 
+                selectedType.classList.remove('selected_type');
             }
-    
-         
+            taskSubtype = undefined;
+            taskType = e.currentTarget.innerText;
+            e.currentTarget.setAttribute('class','selected_type');
+            setTaskSummary();
+            showSubtypes(taskType);
+        }
 
-            function selectSubType(e) {
-                e.preventDefault();
-                if (taskSubtype !== undefined) {
-                let selectedTask = document.querySelector('.selected_task');
-                selectedTask.classList.remove('selected_task');
-                }
-                taskSubtype = e.currentTarget.innerText;                        
-                e.currentTarget.setAttribute('class','selected_task'); 
-                setTaskSummary();                       
-            }     
-        
-            
-            function showSubtypes(selectedType){
-                var subTypesDiv = document.getElementById('task');
-                subTypesDiv.innerHTML = '';
-                let title = document.createElement('p');
-                subTypesDiv.append(title);
-                title.innerText = `${taskType.toUpperCase()} TASKS`;
-                var selectedSubtypes = taskTypes.find(task => task.type === selectedType);
-                var subTypesDivs = new Array;
-                
-                for (let i in selectedSubtypes.tasks) {
-                    subTypesDivs[i] = document.createElement('div');
-                    subTypesDivs[i].innerHTML =  selectedSubtypes.tasks[i];
-                    subTypesDivs[i].addEventListener('click', selectSubType, true);
-                    subTypesDiv.append(subTypesDivs[i]); 
-                }
-            }    
-            
-            
-    
-            document.getElementById('description').addEventListener('change', (e) => {
-                taskDescription = document.getElementById('description').value;
-                setTaskSummary();
-            }, false);
-        
-    
-        var createTaskButton =  document.getElementById('submit');      
-    
-        createTaskButton.innerText = 'CREATE TASK';
-    
-        function newTask (location, type, subType, description) {
-            this.id = Date.now().toString();
-            this.location = location;
-            this.type = type;
-            this.subType = subType;
-            this.description = description;
-         }
-            
-        function addTask(e){
+        function selectSubType(e) {
             e.preventDefault();
+            if (taskSubtype !== undefined) {
+            let selectedTask = document.querySelector('.selected_task');
+            selectedTask.classList.remove('selected_task');
+            }
+            taskSubtype = e.currentTarget.innerText;                        
+            e.currentTarget.setAttribute('class','selected_task'); 
+            setTaskSummary();                       
+        } 
+        
+       function addTask(e){ 
+        e.preventDefault();
             taskLocation = document.getElementById('location').value; 
             var task = new newTask(taskLocation, taskType, taskSubtype, taskDescription);
             console.log(JSON.stringify(task));
-    
             let xhr = new XMLHttpRequest();
             xhr.open('POST', 'http://localhost:3333/tasks', true) ;
-           xhr.onload = function(){                    
+                xhr.onload = function(){   
+                    location.reload(true);                 
             }
             xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(task));  
-            location.reload(true);               
+            xhr.send(JSON.stringify(task));             
         }
-
 
         function editTask(e){
             e.preventDefault();
@@ -368,31 +348,35 @@
             task.description = taskDescription;
             task.type = taskType;
             task.task = taskSubtype;
-            
-            console.log(JSON.stringify(task));
-            console.log(`http://localhost:3333/${task.id}`);
-    
             let xhr = new XMLHttpRequest();
             xhr.open('PUT', `http://localhost:3333/${task.id}`, true) ;
             xhr.onload = function(){
-                //location.reload(true);                     
+                location.reload(true);                     
             }
             xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(task));  
-            
+            xhr.send(JSON.stringify(task)); 
         }
-
     
-        createTaskButton.addEventListener('click',editTask, false); 
+        
+        function showSubtypes(selectedType){
+            var subTypesDiv = document.getElementById('task');
+            subTypesDiv.innerHTML = '';
+            let title = document.createElement('p');
+            subTypesDiv.append(title);
+            title.innerText = `${taskType.toUpperCase()} TASKS`;
+            var selectedSubtypes = taskTypes.find(task => task.type === selectedType);
+            var subTypesDivs = new Array;
+            
+            for (let i in selectedSubtypes.tasks) {
+                subTypesDivs[i] = document.createElement('div');
+                subTypesDivs[i].innerHTML =  selectedSubtypes.tasks[i];
+                subTypesDivs[i].addEventListener('click', selectSubType, true);
+                subTypesDiv.append(subTypesDivs[i]); 
+            }
+        } 
     }
      
-
-
-
-
     getTasks();
-    //editTaskList(); ///Should be put to event listener of the new task
-  </script> 
-  <script src='getTasks.js'></script>
+    </script> 
 </body>
 </html>

@@ -1,16 +1,13 @@
 const exp = require('express');
-const PORT = process.env.PORT || 3000;
 const app = exp();
 const fs = require('fs');
 const bp = require('body-parser');
-
 const http = require('http');
-var requirejs = require('requirejs');
-const mainscript = require('./getTasks');
+//var requirejs = require('requirejs');
+//const mainscript = require('./getTasks');
 
 app.use(bp.json());
 app.use(bp.urlencoded({extend: true}));
-
 
 try {
     fs.statSync('./tasks.txt');
@@ -22,7 +19,6 @@ catch (err) {
     } )
   }
 }
-
 
 app.get('/', (req, res)=> {
     res.sendfile('tasks.html');    
@@ -46,16 +42,12 @@ app.get('/:id', (req, res)=> {
             return
         }
         let tasks = JSON.parse(content);  
-        console.log(req.params.id);
         let task = tasks.find(task => task.id === String(req.params.id));
-        console.log(task);     
         res.send(task);    
     })    
 })
 
 app.post('/tasks', (req, res)=>{
-
-    
     let task = req.body;
     fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
         if (err) {
@@ -70,7 +62,6 @@ app.post('/tasks', (req, res)=>{
     });
     res.send(JSON.stringify(tasks));
 })
-
 
 app.put('/:id', (req, res)=> {
     fs.readFile('./tasks.txt', 'utf8', (err, content)=>{
@@ -102,7 +93,6 @@ app.delete('/:id', (req, res)=> {
          })         
     })    
 })
-
 
 app.listen(3333, () => {
     console.log('API is running')
