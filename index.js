@@ -3,8 +3,6 @@ const app = exp();
 const fs = require('fs');
 const bp = require('body-parser');
 const http = require('http');
-//var requirejs = require('requirejs');
-//const mainscript = require('./getTasks');
 
 app.use(bp.json());
 app.use(bp.urlencoded({extend: true}));
